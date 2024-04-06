@@ -2,10 +2,27 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import avatar from '../assets/profile.png'
 import styles from '../styles/Username.module.css'
+import { Toaster } from 'react-hot-toast'
+import { useFormik } from 'formik'
+import { usernameValidate } from '../helper/validate'
 
 const Username = () => {
+  const formik = useFormik({
+    initialValues: {
+      username: ""
+    },
+    validate: usernameValidate, // Validation function. Must return an error object or promise that throws an error object where that object keys map to corresponding value.
+    validateOnBlur: false,
+    validateOnChange: false,
+    onSubmit: async (values) => {
+      console.log(values)
+    }
+  })
+
   return (
     <div className='container mx-auto'>
+      <Toaster position='top-right' reverseOrder={false}></Toaster>
+
       <div className="flex justify-center items-center h-screen">
         <div className={styles.glass}>
 
@@ -16,13 +33,16 @@ const Username = () => {
             </span>
           </div>
 
-          <form className='py-1'>
+          <form
+            onSubmit={formik.handleSubmit}
+            className='py-1'
+          >
             <div className="profile flex justify-center py-4">
               <img src={avatar} alt="avatar" className={styles.profile_img} />
             </div>
 
             <div className="textbox flex flex-col items-center gap-6">
-              <input type="text" className={styles.textbox} placeholder='Username' />
+              <input {...formik.getFieldProps('username')} type="text" className={styles.textbox} placeholder='Username' />
               <button className={styles.btn} type='submit'>Let's Go</button>
             </div>
 
