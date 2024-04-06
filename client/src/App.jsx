@@ -7,6 +7,7 @@ import Reset from './components/Reset'
 import Recovery from './components/Recovery'
 import Profile from './components/Profile'
 import PageNotFound from './components/PageNotFound'
+import Password from './components/Password'
 
 const App = () => {
   return (
@@ -14,6 +15,9 @@ const App = () => {
       <Routes>
         <Route path='/' element={<Username />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/password' element={<Password />} />
+        <Route path='/recovery' element={<Recovery />} />
+        <Route path='/profile' element={<Profile />} />
       </Routes>
     </BrowserRouter>
   )
