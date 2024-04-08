@@ -18,6 +18,8 @@ const App = () => {
         <Route path='/password' element={<Password />} />
         <Route path='/recovery' element={<Recovery />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/reset' element={<Reset />} />
+        <Route path='*' element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
   )
