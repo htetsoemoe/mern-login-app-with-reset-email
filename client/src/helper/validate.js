@@ -32,6 +32,12 @@ export async function registerFormValidation(values) {
     return errors
 }
 
+/** Validate Profile Form */
+export async function profileFormValidation(values) {
+    const errors = emailVerify({}, values)
+    return errors
+}
+
 /** ************************************************************************************************** */
 
 /** validate username in login page  */
