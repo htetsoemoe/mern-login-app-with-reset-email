@@ -1,4 +1,6 @@
-
+import UserModel from "../models/User.model.js"
+import bcrypt from "bcrypt"
+import errorHandler from "../utils/errorHandler.js"
 
 /** Middleware fo verify user */
 export async function verifyUser(req, res, next) {
@@ -18,7 +20,36 @@ export async function verifyUser(req, res, next) {
 }
 */
 export async function register(req, res, next) {
-    res.status(200).json('User Register')
+    const { username, email, password, profile } = req.body
+
+    if (
+        !username ||
+        !password ||
+        !email
+    ) {
+        return next(errorHandler(400, 'username, password, email are required'))
+    }
+
+    try {
+        // check existedUser or existedEmail
+        const existedUser = await UserModel.findOne({ username: username })
+        const existedEmail = await UserModel.findOne({ email: email })
+        if (existedUser || existedEmail) {
+            return next(errorHandler(404, 'Already existed username or email'))
+        }
+
+        const hashedPassword = bcrypt.hashSync(password, 10)
+        const newUser = new UserModel({
+            username,
+            password: hashedPassword,
+            email,
+            profile: profile || ''
+        })
+        await newUser.save()
+        res.status(201).json('User created successfully')
+    } catch (error) {
+        next(error)
+    }
 }
 
 /** POST: http://localhost:3500/api/login 

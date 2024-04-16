@@ -3,10 +3,14 @@ import cors from 'cors'
 import morgan from 'morgan'
 import connect from './database/conn.js'
 import router from './router/route.js'
-
-const app = express()
+import dotEnv from 'dotenv'
+import mongoose from 'mongoose'
 
 const PORT = 3500
+const app = express()
+
+dotEnv.config()
+connect()   // connect to mongoDB Atlas
 
 // middlewares
 app.use(express.json())
@@ -21,15 +25,23 @@ app.get('/', (req, res) => {
 
 app.use('/api', router)
 
+// Default Error Handler
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500
+    const message = err.message || 'Internal Server Error'
+    res.status(statusCode).json({
+        success: false,
+        statusCode,
+        message
+    })
+})
+
 /** Start server only when we have valid connection */
-connect().then(() => {
-    try {
-        app.listen(PORT, () => {
-            console.log(`Server is running at http://localhost:${PORT}`)
-        })
-    } catch (error) {
-        console.log('Cannot connect to the server')
-    }
-}).catch(error => {
-    console.log('Invalid database connection...!')
+mongoose.connection.once('open', () => {
+    console.log("Connected to MongoDB Atlas")
+    app.listen(PORT, () => console.log(`NodeJS server is running on a port: ${PORT}`))
+})
+
+mongoose.connection.on('error', err => {
+    console.log(err)
 })
