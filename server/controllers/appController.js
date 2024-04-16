@@ -34,8 +34,11 @@ export async function register(req, res, next) {
         // check existedUser or existedEmail
         const existedUser = await UserModel.findOne({ username: username })
         const existedEmail = await UserModel.findOne({ email: email })
-        if (existedUser || existedEmail) {
-            return next(errorHandler(404, 'Already existed username or email'))
+        if (existedUser) {
+            return next(errorHandler(404, 'Already existed username'))
+        }
+        if (existedEmail) {
+            return next(errorHandler(404, 'Already existed email'))
         }
 
         const hashedPassword = bcrypt.hashSync(password, 10)
