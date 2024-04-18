@@ -107,7 +107,17 @@ export async function login(req, res, next) {
 
 /** GET: http://localhost:3500/api/user/example123 */
 export async function getUser(req, res, next) {
-    res.status(200).json('Get user')
+    try {
+        const user = await UserModel.findOne({ username: req.params.username })
+        if (!user) {
+            return next(errorHandler(404, 'User not found'))
+        }
+        // remove password from found user
+        const { password, ...rest } = user._doc
+        res.status(200).json(rest)
+    } catch (error) {
+        next(error)
+    }
 }
 
 /** PUT: http://localhost:3500/api/updateuser 
