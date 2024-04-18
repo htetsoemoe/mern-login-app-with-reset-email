@@ -1,10 +1,19 @@
 import UserModel from "../models/User.model.js"
 import bcrypt from "bcrypt"
 import errorHandler from "../utils/errorHandler.js"
+import jwt from 'jsonwebtoken'
 
 /** Middleware fo verify user */
 export async function verifyUser(req, res, next) {
-    res.status(200).json('Verify User')
+    try {
+        const { username } = req.method === 'GET' ? req.query : req.body
+        // Check User exist
+        let exist = await UserModel.findOne({ username })
+        if (!exist) return res.status(404).json("Can't find user!")
+        next()
+    } catch (error) {
+        return res.status(404).json('Authentication Error: Wrong Username')
+    }
 }
 
 /** POST: http://localhost:3500/api/register 
@@ -62,7 +71,38 @@ export async function register(req, res, next) {
 }
 */
 export async function login(req, res, next) {
-    res.status(200).json('Login')
+    const { username, password } = req.body
+
+    if (!username || !password || username === '' || password === '') {
+        return next(errorHandler(400, "All fields are required!"))
+    }
+
+    try {
+        const validUser = await UserModel.findOne({ username })
+        if (!validUser) {
+            return next(errorHandler(404, 'User not found: Wrong username'))
+        }
+
+        const validPassword = bcrypt.compareSync(password, validUser.password)
+        if (!validPassword) {
+            return next(errorHandler(400, 'Wrong Password'))
+        }
+
+        // Generate JWT Token
+        const token = jwt.sign({
+            userId: validUser._id,
+            username: validUser.username
+        }, process.env.JWT_SECRET)
+
+        res.status(200)
+            .json({
+                msg: "Login Successful",
+                username: validUser.username,
+                token
+            })
+    } catch (error) {
+        next(error)
+    }
 }
 
 /** GET: http://localhost:3500/api/user/example123 */
