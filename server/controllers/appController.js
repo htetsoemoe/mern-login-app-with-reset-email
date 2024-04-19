@@ -131,7 +131,23 @@ body: {
 }
 */
 export async function updateUser(req, res, next) {
-    res.status(200).json('Update user')
+    const id = req.query.id
+    if (!id) {
+        return next(errorHandler(404, 'User ID required'))
+    }
+
+    try {
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            { _id: id },
+            req.body,
+            { new: true }
+        )
+
+        const { password: pass, ...rest } = updatedUser._doc
+        res.status(200).json(rest)
+    } catch (error) {
+        next(error)
+    }
 }
 
 /** GET: http://localhost:3500/api/generateOTP */
