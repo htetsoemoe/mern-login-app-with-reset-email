@@ -131,14 +131,15 @@ body: {
 }
 */
 export async function updateUser(req, res, next) {
-    const id = req.query.id
-    if (!id) {
-        return next(errorHandler(404, 'User ID required'))
+    // const id = req.query.id
+    const { userId } = req.user
+    if (!userId) {
+        return next(errorHandler(401, 'Unauthorized User!'))
     }
 
     try {
         const updatedUser = await UserModel.findByIdAndUpdate(
-            { _id: id },
+            { _id: userId },
             req.body,
             { new: true }
         )

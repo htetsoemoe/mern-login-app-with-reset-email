@@ -4,6 +4,7 @@ const router = Router()
 /** Import all controllers */
 import * as controller from '../controllers/appController.js'
 import { registerMail } from "../controllers/mailer.js";
+import Auth from "../middlewares/auth.js";
 
 /** POST Methods */
 router.route('/register').post(controller.register) // register user
@@ -18,7 +19,7 @@ router.route('/verifyOTP').get(controller.verifyUser, controller.verifyOTP) // v
 router.route('/createResetSession').get(controller.createResetSession) // reset all the variables
 
 /** PUT Methods */
-router.route('/updateUser').put(controller.updateUser) // update the user's profile
+router.route('/updateUser').put(Auth, controller.updateUser) // update the user's profile
 router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword) // reset password
 
 export default router
