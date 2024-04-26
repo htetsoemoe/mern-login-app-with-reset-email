@@ -14,3 +14,17 @@ export default async function Auth(req, res, next) {
         res.status(401).json({ error: "Unauthorized User!" })
     }
 }
+
+/** 
+ * The app.locals object is a JavaScript object, and its properties are local variables within the application.
+ * Once set, the value of app.locals properties persist throughout the life of the application
+ * 
+ * Ref: https://stackoverflow.com/questions/35111143/express4-whats-the-difference-between-app-locals-res-locals-and-req-app-local
+ */
+export function localVariables(req, res, next) {
+    req.app.locals = {
+        OTP: null,
+        resetSession: false,
+    }
+    next()
+}
