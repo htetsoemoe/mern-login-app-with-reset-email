@@ -176,11 +176,41 @@ export async function verifyOTP(req, res, next) {
 // successfully redirect user when OTP is valid
 /** GET: http://localhost:3500/api/createResetSession */
 export async function createResetSession(req, res, next) {
-    res.status(200).json('createResetSession')
+    if (req.app.locals.resetSession) {  // req.app.locals.resetSession = true
+        return res.status(201).json({ flag: req.app.locals.resetSession })
+    }
+    return res.status(404).json({ error: "Session expired!" })
 }
 
 // update the password when we have valid session
 /** PUT: http://localhost:3500/api/resetPassword */
 export async function resetPassword(req, res, next) {
-    res.status(200).json('resetPassword')
+    if (!req.app.locals.resetSession) {
+        return res.status(404).json({ error: "Session expired!" })
+    }
+
+    const { username, password } = req.body
+
+    try {
+        const foundUser = await UserModel.findOne({ username })
+        if (!foundUser) {
+            return next(errorHandler(404, 'User not found'))
+        }
+
+        const hashedPassword = bcrypt.hashSync(password, 10)
+        const updatedUserPassword = await UserModel.findByIdAndUpdate(
+            { _id: foundUser._id },
+            { password: hashedPassword },
+            { new: true }
+        )
+        // const { password: pass, ...rest } = updatedUserPassword._doc
+        req.app.locals.resetSession = false // reset session 
+        return res.status(201).json({
+            // updatedUserPassword: rest,
+            msg: "Updated Password Successful!"
+        })
+
+    } catch (error) {
+        next(error)
+    }
 }
