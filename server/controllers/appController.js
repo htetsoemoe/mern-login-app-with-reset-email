@@ -59,7 +59,7 @@ export async function register(req, res, next) {
             profile: profile || ''
         })
         await newUser.save()
-        res.status(201).json('User created successfully')
+        res.status(201).json({ msg: 'User registration successfully' })
     } catch (error) {
         next(error)
     }
@@ -133,7 +133,7 @@ body: {
 */
 export async function updateUser(req, res, next) {
     // const id = req.query.id
-    const { userId } = req.user
+    const { userId } = req.user // userId and username
     if (!userId) {
         return next(errorHandler(401, 'Unauthorized User!'))
     }
