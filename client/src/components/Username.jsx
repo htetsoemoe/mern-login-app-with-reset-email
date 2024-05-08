@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import avatar from '../assets/profile.png'
 import styles from '../styles/Username.module.css'
@@ -6,19 +6,29 @@ import { Toaster } from 'react-hot-toast'
 import { useFormik } from 'formik'
 import { usernameValidate } from '../helper/validate'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/store'
 
 const Username = () => {
   const navigate = useNavigate()
+
+  // Using zustand state
+  const setUsername = useAuthStore(state => state.setUsername)
+  //const username = useAuthStore(state => state.auth.username)
+
+  // useEffect(() => {
+  //   console.log(username)
+  // }, [])
 
   const formik = useFormik({
     initialValues: {
       username: ""
     },
-    validate: usernameValidate, // Validation function. Must return an error object or promise that throws an error object where that object keys map to corresponding value.
+    validate: usernameValidate, // Validation function(Using Server-side api request). Must return an error object or promise that throws an error object where that object keys map to corresponding value.
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
       console.log(values)
+      setUsername(values.username)
       navigate('/password')
     }
   })
