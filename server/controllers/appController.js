@@ -115,7 +115,7 @@ export async function getUser(req, res, next) {
         }
         // remove password from found user
         const { password, ...rest } = user._doc
-        res.status(200).json(rest)
+        res.status(201).json(rest)
     } catch (error) {
         next(error)
     }
@@ -138,10 +138,15 @@ export async function updateUser(req, res, next) {
         return next(errorHandler(401, 'Unauthorized User!'))
     }
 
+    let hashedPassword = null
+    if (req.body.password) {
+        hashedPassword = bcrypt.hashSync(req.body.password, 10)
+    }
+
     try {
         const updatedUser = await UserModel.findByIdAndUpdate(
             { _id: userId },
-            req.body,
+            {...req.body, password: hashedPassword},
             { new: true }
         )
 
